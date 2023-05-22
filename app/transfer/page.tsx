@@ -27,7 +27,6 @@ export default function TransferPage() {
         pt="60px"
         justify="center"
         align="center"
-        bg="linear-gradient(0deg, #ABDCFF 10%, #0396FF 100%)"
       >
         <Box
           bg="white"

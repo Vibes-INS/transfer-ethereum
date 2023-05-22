@@ -9,7 +9,7 @@ export const POLYGON_API_ETHERSCAN_KEY =
   process.env.NEXT_PUBLIC_POLYGON_API_ETHERSCAN_KEY || ''
 
 export const POLYGON_API_SERVER =
-  process.env.NEXT_PUBLIC_POLYGON_API_ETHERSCAN_KEY ||
+  process.env.NEXT_PUBLIC_POLYGON_API_SERVER ||
   'https://api.polygonscan.com/api'
 
 export const GOERLI_FAUCET_URL =

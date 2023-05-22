@@ -1,6 +1,6 @@
 'use client'
 
-import { useAccount, useNetwork } from 'wagmi'
+import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Center } from '@chakra-ui/react'
 import { redirect } from 'next/navigation'

@@ -26,6 +26,7 @@ import { useIsClient } from '@/hooks/useIsClient'
 import { useSendErc20Transaction } from '@/hooks/useSendErc20Transaction'
 import { SentTransactionDialog } from '@/components/SentTransactionDialog'
 import { SendFailedDialog } from '@/components/SendFailedDialog'
+import { routePath } from '@/constants/RoutePath'
 
 export const Transfer = () => {
   const [address, setAddress] = useState<Address>('' as Address)
@@ -59,7 +60,12 @@ export const Transfer = () => {
       <SendFailedDialog error={error || erc20Error} />
       <VStack direction="column" spacing="8" w="full" maxW="500px" px={6}>
         <HStack w="full" spacing="6">
-          <Button variant="link" as={Link} href="/history" colorScheme="blue">
+          <Button
+            variant="link"
+            as={Link}
+            href={routePath.history()}
+            colorScheme="blue"
+          >
             Transfer History
           </Button>
           <Button
