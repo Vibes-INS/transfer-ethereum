@@ -2,15 +2,15 @@ import { useCallback, useMemo, useState } from 'react'
 import { useProvider } from '@/hooks/useProvider'
 import { ethers } from 'ethers'
 
-export function useTransferEth<E = unknown>() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function useSendTransaction<E = unknown>() {
+  const [isSending, setIsSending] = useState(false)
   const provider = useProvider()
   const signer = useMemo(() => provider?.getSigner(), [provider])
   const [error, setError] = useState<E | null>(null)
   const [receipt, setReceipt] =
     useState<ethers.providers.TransactionReceipt | null>(null)
 
-  const onSubmit = useCallback(
+  const sendTransaction = useCallback(
     async (
       to: string,
       options?: {
@@ -18,9 +18,9 @@ export function useTransferEth<E = unknown>() {
       }
     ) => {
       if (!signer || !provider) return
-      if (isSubmitting) return
+      if (isSending) return
       try {
-        setIsSubmitting(true)
+        setIsSending(true)
         const value = options?.amount
           ? ethers.utils.parseUnits(options.amount, 'ether')
           : undefined
@@ -32,10 +32,10 @@ export function useTransferEth<E = unknown>() {
         setReceipt(r)
       } catch (err) {
         setError(err as E)
-        setIsSubmitting(false)
+        setIsSending(false)
       }
     },
-    [isSubmitting, provider, signer]
+    [isSending, provider, signer]
   )
 
   const clear = useCallback(() => {
@@ -44,8 +44,8 @@ export function useTransferEth<E = unknown>() {
   }, [])
 
   return {
-    onSubmit,
-    isSubmitting,
+    sendTransaction,
+    isSending,
     error,
     receipt,
     clear,

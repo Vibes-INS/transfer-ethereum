@@ -1,11 +1,10 @@
 import { useIsClient } from '@/hooks/useIsClient'
 import { useMemo } from 'react'
 import { ethers } from 'ethers'
-import { useAccount, useNetwork } from 'wagmi'
+import { useNetwork } from 'wagmi'
 
-export function useProvider() {
+export const useProvider = () => {
   const isClient = useIsClient()
-  const account = useAccount()
   const network = useNetwork()
   return useMemo(
     () =>
@@ -20,6 +19,6 @@ export function useProvider() {
               : undefined
           )
         : null,
-    [isClient, network.chain, account.address]
+    [isClient, network.chain]
   )
 }

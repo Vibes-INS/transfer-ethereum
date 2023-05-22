@@ -13,22 +13,35 @@ import {
 import React, { useState } from 'react'
 import { Link } from '@chakra-ui/next-js'
 import { GOERLI_FAUCET_URL } from '@/constants/env'
-import { limitToNumericString, isPrimitiveEthAddress } from '@/libs/utils'
-import { useTransferEth } from '@/hooks/useTransferEth'
+import {
+  limitToNumericString,
+  isPrimitiveEthAddress,
+  isValidNumber,
+} from '@/libs/utils'
+import { useSendTransaction } from '@/hooks/useSendTransaction'
 import { useCurrentBalance } from '@/hooks/useCurrentBalance'
 import type { Address } from 'wagmi'
 import { useIsClient } from '@/hooks/useIsClient'
+import { useSendErc20Transaction } from '@/hooks/useSendErc20Transaction'
 
 export const Transfer = () => {
   const [address, setAddress] = useState<Address>('' as Address)
   const [amount, setAmount] = useState('')
-  const [erc20TokenContractAddress, setERC20TokenContractAddress] = useState('')
+  const [erc20TokenContractAddress, setERC20TokenContractAddress] =
+    useState<Address>('' as Address)
   const isClient = useIsClient()
 
   const isValidAddress = isPrimitiveEthAddress(address)
-  const { onSubmit, isSubmitting, receipt, error } = useTransferEth()
+  const isValidAmount = isValidNumber(amount)
+  const { sendTransaction, isSending, receipt, error } = useSendTransaction()
+  const {
+    sendErc20Transaction,
+    error: erc20Error,
+    isSending: isSendingErc20Token,
+    receipt: erc20Receipt,
+  } = useSendErc20Transaction()
 
-  const { data, error: getBalanceError } = useCurrentBalance({
+  const { data, error: errorThatGetBalance } = useCurrentBalance({
     token: isPrimitiveEthAddress(erc20TokenContractAddress)
       ? (erc20TokenContractAddress as Address)
       : undefined,
@@ -59,7 +72,7 @@ export const Transfer = () => {
           placeholder="Please enter an Ethereum address"
         />
       </FormControl>
-      <FormControl>
+      <FormControl isRequired>
         <FormLabel>Amount</FormLabel>
         <Input
           value={amount}
@@ -71,10 +84,12 @@ export const Transfer = () => {
         <FormLabel>ERC20 Token Contract Address</FormLabel>
         <Input
           value={erc20TokenContractAddress}
-          onChange={(e) => setERC20TokenContractAddress(e.target.value)}
+          onChange={(e) =>
+            setERC20TokenContractAddress(e.target.value as Address)
+          }
           placeholder="Please enter an Ethereum address"
         />
-        {getBalanceError ? (
+        {errorThatGetBalance ? (
           <Box mt={2} color="red.600" h="56px">
             The token was not found
           </Box>
@@ -95,12 +110,19 @@ export const Transfer = () => {
           type="submit"
           colorScheme="blue"
           w="full"
-          isDisabled={!isValidAddress}
-          isLoading={isSubmitting}
+          isDisabled={!isValidAddress || !isValidAmount}
+          isLoading={isSending || isSendingErc20Token}
           onClick={() => {
-            onSubmit(address, {
-              amount,
-            })
+            if (
+              isPrimitiveEthAddress(erc20TokenContractAddress) &&
+              !errorThatGetBalance
+            ) {
+              sendErc20Transaction(erc20TokenContractAddress, address, amount)
+            } else {
+              sendTransaction(address, {
+                amount,
+              })
+            }
           }}
         >
           Submit
