@@ -23,6 +23,8 @@ import { useCurrentBalance } from '@/hooks/useCurrentBalance'
 import type { Address } from 'wagmi'
 import { useIsClient } from '@/hooks/useIsClient'
 import { useSendErc20Transaction } from '@/hooks/useSendErc20Transaction'
+import { SentTransactionDialog } from '@/components/SentTransactionDialog'
+import { SendFailedDialog } from '@/components/SendFailedDialog'
 
 export const Transfer = () => {
   const [address, setAddress] = useState<Address>('' as Address)
@@ -33,6 +35,9 @@ export const Transfer = () => {
 
   const isValidAddress = isPrimitiveEthAddress(address)
   const isValidAmount = isValidNumber(amount)
+  const isValidERC20TokenContractAddress = isPrimitiveEthAddress(
+    erc20TokenContractAddress
+  )
   const { sendTransaction, isSending, receipt, error } = useSendTransaction()
   const {
     sendErc20Transaction,
@@ -42,92 +47,94 @@ export const Transfer = () => {
   } = useSendErc20Transaction()
 
   const { data, error: errorThatGetBalance } = useCurrentBalance({
-    token: isPrimitiveEthAddress(erc20TokenContractAddress)
+    token: isValidERC20TokenContractAddress
       ? (erc20TokenContractAddress as Address)
       : undefined,
   })
 
   return (
-    <VStack direction="column" spacing="8" w="full" maxW="500px" px={6}>
-      <HStack w="full" spacing="6">
-        <Button variant="link" as={Link} href="/history" colorScheme="blue">
-          Transfer History
-        </Button>
-        <Button
-          variant="link"
-          as="a"
-          href={GOERLI_FAUCET_URL}
-          colorScheme="blue"
-          target="_blank"
-        >
-          Goerli Facuet
-        </Button>
-      </HStack>
-      <FormControl isRequired>
-        <FormLabel>To Address</FormLabel>
-        <Textarea
-          value={address}
-          onChange={(e) => setAddress(e.target.value as Address)}
-          resize="none"
-          placeholder="Please enter an Ethereum address"
-        />
-      </FormControl>
-      <FormControl isRequired>
-        <FormLabel>Amount</FormLabel>
-        <Input
-          value={amount}
-          onChange={(e) => setAmount(limitToNumericString(e.target.value))}
-          placeholder="Please enter a number"
-        />
-      </FormControl>
-      <FormControl>
-        <FormLabel>ERC20 Token Contract Address</FormLabel>
-        <Input
-          value={erc20TokenContractAddress}
-          onChange={(e) =>
-            setERC20TokenContractAddress(e.target.value as Address)
-          }
-          placeholder="Please enter an Ethereum address"
-        />
-        {errorThatGetBalance ? (
-          <Box mt={2} color="red.600" h="56px">
-            The token was not found
-          </Box>
-        ) : (
-          <VStack mt={2} align="start">
-            <Box>
-              TokenName: <Box as="strong">{isClient ? data?.symbol : null}</Box>
-            </Box>
-            <Box>
-              Balance:{' '}
-              <Box as="strong">{isClient ? data?.formatted : null}</Box>
-            </Box>
-          </VStack>
-        )}
-      </FormControl>
-      <FormControl>
-        <Button
-          type="submit"
-          colorScheme="blue"
-          w="full"
-          isDisabled={!isValidAddress || !isValidAmount}
-          isLoading={isSending || isSendingErc20Token}
-          onClick={() => {
-            if (
-              isPrimitiveEthAddress(erc20TokenContractAddress) &&
-              !errorThatGetBalance
-            ) {
-              sendErc20Transaction(erc20TokenContractAddress, address, amount)
-            } else {
-              sendTransaction(address, {
-                amount,
-              })
+    <>
+      <SentTransactionDialog receipt={receipt || erc20Receipt} />
+      <SendFailedDialog error={error || erc20Error} />
+      <VStack direction="column" spacing="8" w="full" maxW="500px" px={6}>
+        <HStack w="full" spacing="6">
+          <Button variant="link" as={Link} href="/history" colorScheme="blue">
+            Transfer History
+          </Button>
+          <Button
+            variant="link"
+            as="a"
+            href={GOERLI_FAUCET_URL}
+            colorScheme="blue"
+            target="_blank"
+          >
+            Goerli Facuet
+          </Button>
+        </HStack>
+        <FormControl isRequired>
+          <FormLabel>To Address</FormLabel>
+          <Textarea
+            value={address}
+            onChange={(e) => setAddress(e.target.value as Address)}
+            resize="none"
+            placeholder="Please enter an Ethereum address"
+          />
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel>Amount</FormLabel>
+          <Input
+            value={amount}
+            onChange={(e) => setAmount(limitToNumericString(e.target.value))}
+            placeholder="Please enter a number"
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>ERC20 Token Contract Address</FormLabel>
+          <Input
+            value={erc20TokenContractAddress}
+            onChange={(e) =>
+              setERC20TokenContractAddress(e.target.value as Address)
             }
-          }}
-        >
-          Submit
-        </Button>
-      </FormControl>
-    </VStack>
+            placeholder="Please enter an Ethereum address"
+          />
+          {errorThatGetBalance ? (
+            <Box mt={2} color="red.600" h="56px">
+              The token was not found
+            </Box>
+          ) : (
+            <VStack mt={2} align="start">
+              <Box>
+                TokenName:{' '}
+                <Box as="strong">{isClient ? data?.symbol : null}</Box>
+              </Box>
+              <Box>
+                Balance:{' '}
+                <Box as="strong">{isClient ? data?.formatted : null}</Box>
+              </Box>
+            </VStack>
+          )}
+        </FormControl>
+        <FormControl>
+          <Button
+            type="submit"
+            colorScheme="blue"
+            w="full"
+            isDisabled={!isValidAddress || !isValidAmount}
+            isLoading={isSending || isSendingErc20Token}
+            onClick={() => {
+              if (isValidERC20TokenContractAddress && !errorThatGetBalance) {
+                sendErc20Transaction(erc20TokenContractAddress, address, amount)
+              } else {
+                sendTransaction(address, {
+                  amount,
+                })
+              }
+            }}
+          >
+            Submit
+          </Button>
+        </FormControl>
+      </VStack>
+    </>
   )
 }

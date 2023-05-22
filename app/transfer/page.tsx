@@ -27,7 +27,7 @@ export default function TransferPage() {
         justify="center"
         align="center"
       >
-        {<Transfer />}
+        <Transfer />
       </Flex>
     </>
   )
