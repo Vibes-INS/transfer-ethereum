@@ -29,6 +29,7 @@ export function useSendTransaction<E = unknown>() {
           value,
         })
         const r = await tx.wait()
+        setIsSending(false)
         setReceipt(r)
       } catch (err) {
         setError(err as E)
