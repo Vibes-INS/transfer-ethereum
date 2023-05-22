@@ -1,6 +1,5 @@
 export const routePath = {
   root: () => '/' as const,
-  transfer: () => '/transfer' as const,
   history: () => '/history' as const,
 }
 

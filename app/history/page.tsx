@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi'
+import { useAccount, useNetwork } from 'wagmi'
 import { useAPI } from '@/hooks/useAPI'
 import React, { useMemo, useState } from 'react'
 import { NavigationBar } from '@/components/NavigationBar'
@@ -92,7 +92,7 @@ export default function HistoryPage() {
         >
           <Button
             as={Link}
-            href={routePath.transfer()}
+            href={routePath.root()}
             variant="link"
             pos="absolute"
             top="8"
