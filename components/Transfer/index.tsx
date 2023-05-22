@@ -66,7 +66,7 @@ export const Transfer = () => {
             href={routePath.history()}
             colorScheme="blue"
           >
-            Transfer History
+            Transaction History
           </Button>
           <Button
             variant="link"

@@ -27,6 +27,8 @@ import { routePath } from '@/constants/RoutePath'
 import { useIsClient } from '@/hooks/useIsClient'
 import { useNonce } from '@/hooks/useNonce'
 import { ethers } from 'ethers'
+import { QueryKey } from '@/constants/QueryKey'
+import { Link } from '@chakra-ui/next-js'
 
 export default function HistoryPage() {
   const api = useAPI()
@@ -41,7 +43,7 @@ export default function HistoryPage() {
   const [page, setPage] = useState(1)
   const offset = 10
   const { data, isLoading } = useSWR(
-    ['query_history', account.address, page, api, network.chain, nonce],
+    [QueryKey.History, account.address, page, api, network.chain, nonce],
     async () => {
       if (!account.address) return null
       return await api
@@ -88,7 +90,14 @@ export default function HistoryPage() {
           minH="500px"
           pt="20"
         >
-          <Button variant="link" pos="absolute" top="8" left="8">
+          <Button
+            as={Link}
+            href={routePath.transfer()}
+            variant="link"
+            pos="absolute"
+            top="8"
+            left="8"
+          >
             Back to Transfer Page
           </Button>
           {isLoading ? (
@@ -105,63 +114,67 @@ export default function HistoryPage() {
           ) : null}
           <TableContainer h="580px">
             <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th>Transaction Hash</Th>
-                  <Th>Block</Th>
-                  <Th>To</Th>
-                  <Th>Value</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {isClient
-                  ? data?.result.map((item) => {
-                      let value = ethers.utils.formatEther(item.value)
-                      value = value === '0.0' ? '0' : value
-                      return (
-                        <Tr
-                          data-nonce={item.nonce}
-                          key={item.nonce}
-                          h="44px"
-                          borderBottom="1px"
-                          borderBottomColor="gray.200"
-                        >
-                          <Td>
-                            <Button
-                              as="a"
-                              variant="link"
-                              target="_blank"
-                              href={`${network.chain?.blockExplorers?.default.url}/tx/${item.hash}`}
-                              colorScheme="blue"
+              {!isLoading ? (
+                <>
+                  <Thead>
+                    <Tr>
+                      <Th>Transaction Hash</Th>
+                      <Th>Block</Th>
+                      <Th>To</Th>
+                      <Th>Value</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {isClient
+                      ? data?.result.map((item) => {
+                          let value = ethers.utils.formatEther(item.value)
+                          value = value === '0.0' ? '0' : value
+                          return (
+                            <Tr
+                              data-nonce={item.nonce}
+                              key={item.nonce}
+                              h="44px"
+                              borderBottom="1px"
+                              borderBottomColor="gray.200"
                             >
-                              {truncateMiddle(item.hash)}
-                            </Button>
-                          </Td>
-                          <Td>{item.blockNumber}</Td>
-                          <Td>
-                            <Tooltip label={item.to} hasArrow>
-                              <Box as="span">{truncateMiddle(item.to)}</Box>
-                            </Tooltip>
-                          </Td>
-                          <Td>
-                            <Tooltip label={value} hasArrow>
-                              <Box
-                                as="span"
-                                w="100px"
-                                textOverflow="ellipsis"
-                                overflow="hidden"
-                                noOfLines={1}
-                                display="block"
-                              >
-                                {value}
-                              </Box>
-                            </Tooltip>
-                          </Td>
-                        </Tr>
-                      )
-                    })
-                  : null}
-              </Tbody>
+                              <Td>
+                                <Button
+                                  as="a"
+                                  variant="link"
+                                  target="_blank"
+                                  href={`${network.chain?.blockExplorers?.default.url}/tx/${item.hash}`}
+                                  colorScheme="blue"
+                                >
+                                  {truncateMiddle(item.hash)}
+                                </Button>
+                              </Td>
+                              <Td>{item.blockNumber}</Td>
+                              <Td>
+                                <Tooltip label={item.to} hasArrow>
+                                  <Box as="span">{truncateMiddle(item.to)}</Box>
+                                </Tooltip>
+                              </Td>
+                              <Td>
+                                <Tooltip label={value} hasArrow>
+                                  <Box
+                                    as="span"
+                                    w="50px"
+                                    textOverflow="ellipsis"
+                                    overflow="hidden"
+                                    noOfLines={1}
+                                    display="block"
+                                  >
+                                    {value}
+                                  </Box>
+                                </Tooltip>
+                              </Td>
+                            </Tr>
+                          )
+                        })
+                      : null}
+                  </Tbody>
+                </>
+              ) : null}
             </Table>
           </TableContainer>
           {pageOptions.length >= 1 ? (
@@ -171,9 +184,7 @@ export default function HistoryPage() {
                 w="150px"
                 ml="2"
                 value={page}
-                onChange={(e) => {
-                  setPage(Number(e.target.value))
-                }}
+                onChange={(e) => setPage(Number(e.target.value))}
               >
                 {pageOptions.map((p) => (
                   <option value={p} key={p}>
