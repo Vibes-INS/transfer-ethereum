@@ -72,7 +72,7 @@ export default function HistoryPage() {
       <Flex
         as="main"
         w="full"
-        h="100vh"
+        minH="100vh"
         pt="60px"
         justify="center"
         align="center"
@@ -80,14 +80,14 @@ export default function HistoryPage() {
         <Box
           bg="white"
           w="full"
-          h={{ base: 'full', md: 'auto' }}
+          h="auto"
           maxW="800px"
           p="8"
           rounded="lg"
           shadow={{ base: 'none', md: 'xl' }}
           transition="200ms"
           pos="relative"
-          minH="500px"
+          minH={{ base: 'full', md: '500px' }}
           pt="20"
         >
           <Button

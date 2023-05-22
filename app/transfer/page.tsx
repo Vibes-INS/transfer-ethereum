@@ -23,7 +23,8 @@ export default function TransferPage() {
       <Flex
         as="main"
         w="full"
-        h="100vh"
+        h="auto"
+        minH="100vh"
         pt="60px"
         justify="center"
         align="center"
@@ -31,7 +32,8 @@ export default function TransferPage() {
         <Box
           bg="white"
           w="full"
-          h={{ base: 'full', sm: 'auto' }}
+          h="auto"
+          minH={{ base: 'calc(100vh - 60px)', sm: 'unset' }}
           maxW="480px"
           p="8"
           rounded="lg"
