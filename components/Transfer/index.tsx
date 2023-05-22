@@ -9,6 +9,7 @@ import {
   Textarea,
   VStack,
   Box,
+  FormErrorMessage,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { Link } from '@chakra-ui/next-js'
@@ -71,7 +72,10 @@ export const Transfer = () => {
             Goerli Facuet
           </Button>
         </HStack>
-        <FormControl isRequired>
+        <FormControl
+          isRequired
+          isInvalid={(address as string) !== '' && !isValidAddress}
+        >
           <FormLabel>To Address</FormLabel>
           <Textarea
             value={address}
@@ -79,6 +83,7 @@ export const Transfer = () => {
             resize="none"
             placeholder="Please enter an Ethereum address"
           />
+          <FormErrorMessage>Invalid address</FormErrorMessage>
         </FormControl>
         <FormControl isRequired>
           <FormLabel>Amount</FormLabel>
@@ -88,7 +93,7 @@ export const Transfer = () => {
             placeholder="Please enter a number"
           />
         </FormControl>
-        <FormControl>
+        <FormControl isInvalid={!!errorThatGetBalance}>
           <FormLabel>ERC20 Token Contract Address</FormLabel>
           <Input
             value={erc20TokenContractAddress}
@@ -97,11 +102,7 @@ export const Transfer = () => {
             }
             placeholder="Please enter an Ethereum address"
           />
-          {errorThatGetBalance ? (
-            <Box mt={2} color="red.600" h="56px">
-              The token was not found
-            </Box>
-          ) : (
+          {!errorThatGetBalance ? (
             <VStack mt={2} align="start">
               <Box>
                 TokenName:{' '}
@@ -112,7 +113,8 @@ export const Transfer = () => {
                 <Box as="strong">{isClient ? data?.formatted : null}</Box>
               </Box>
             </VStack>
-          )}
+          ) : null}
+          <FormErrorMessage>The token was not found</FormErrorMessage>
         </FormControl>
         <FormControl>
           <Button

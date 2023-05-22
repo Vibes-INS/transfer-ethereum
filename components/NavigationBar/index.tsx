@@ -16,13 +16,18 @@ export const NavigationBar: React.FC = () => {
       left="0"
       h="60px"
       align="center"
-      bg="white"
-      shadow="lg"
+      backdropBlur="20px"
+      transform="translate3d(0, 0, 0)"
+      zIndex={2}
     >
-      <Box>
-        <Heading fontSize="lg">Transfer</Heading>
+      <Box display={{ base: 'none', sm: 'block' }}>
+        <Heading fontSize="lg" color="white">
+          Transfer
+        </Heading>
       </Box>
-      <Box>{isClient ? <ConnectButton /> : null}</Box>
+      <Flex justify="center" w={{ base: 'full', sm: 'auto' }}>
+        {isClient ? <ConnectButton /> : null}
+      </Flex>
     </Flex>
   )
 }
